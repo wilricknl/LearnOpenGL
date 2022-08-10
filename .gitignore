@@ -1,0 +1,8 @@
+# Ignore CLion directories and files
+**/.idea/*
+**/cmake-build-*/*
+**/*.DotSettings.user
+
+# Ignore Visual Studio directories and files
+**/.vs/*
+**/out/*
