@@ -104,15 +104,28 @@ int main()
             0.50f,  0.25f, 0.0f
     };
 
-    unsigned int vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // left triangle
+    unsigned int vboLeft, vaoLeft;
+    glGenVertexArrays(1, &vaoLeft);
+    glGenBuffers(1, &vboLeft);
+    glBindVertexArray(vaoLeft);
 
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, vboLeft);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(0);
+
+    // right triangle
+    unsigned int vboRight, vaoRight;
+    glGenVertexArrays(1, &vaoRight);
+    glGenBuffers(1, &vboRight);
+    glBindVertexArray(vaoRight);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboRight);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices + (sizeof(vertices) / sizeof(float) / 2), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
     // draw wireframe
@@ -126,15 +139,21 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glBindVertexArray(vaoLeft);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glBindVertexArray(vaoRight);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &vboLeft);
+    glDeleteBuffers(1, &vboRight);
+    glDeleteVertexArrays(1, &vaoLeft);
+    glDeleteVertexArrays(1, &vaoRight);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
