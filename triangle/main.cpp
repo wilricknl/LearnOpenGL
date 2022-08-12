@@ -10,11 +10,12 @@ void processInput(GLFWwindow* window);
 
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
+                                 "layout (location = 1) in vec3 aColor;\n"
                                  "out vec4 vertexColor;"
                                  "void main()\n"
                                  "{\n"
                                  "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
-                                 "  vertexColor = vec4(0.5f, 0.7f, 0.9f, 1.0f);\n"
+                                 "  vertexColor = vec4(aColor.xyz, 1.0f);\n"
                                  "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
@@ -137,12 +138,12 @@ int main()
     glDeleteShader(fragmentShaderYellow);
 
     float vertices[] = {
-            -0.25f, -0.25f, 0.0f,
-            -0.75f, -0.25f, 0.0f,
-            -0.50f,  0.25f, 0.0f,
-            0.25f, -0.25f, 0.0f,
-            0.75f, -0.25f, 0.0f,
-            0.50f,  0.25f, 0.0f
+            -0.25f, -0.25f, 0.0f, 1.0f, 0.0f, 0.0f,
+            -0.75f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f,
+            -0.50f,  0.25f, 0.0f, 0.0f, 0.0f, 1.0f,
+            0.25f, -0.25f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.75f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.50f,  0.25f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
     // left triangle
@@ -154,8 +155,11 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vboLeft);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // right triangle
     unsigned int vboRight, vaoRight;
@@ -166,8 +170,11 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vboRight);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices + (sizeof(vertices) / sizeof(float) / 2), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // draw wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
