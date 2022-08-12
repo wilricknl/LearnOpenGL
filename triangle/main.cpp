@@ -22,6 +22,13 @@ const char* fragmentShaderSource = "#version 330 core\n"
                                    "  FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                                    "}\0";
 
+const char* fragmentShaderSourceYellow = "#version 330 core\n"
+                                         "out vec4 FragColor;\n"
+                                         "void main()\n"
+                                         "{\n"
+                                         "  FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                         "}\0";
+
 int main()
 {
     glfwInit();
@@ -92,8 +99,38 @@ int main()
                   << infoLog << '\n';
     }
 
+    // fragment shader yellow creation
+    unsigned int fragmentShaderYellow;
+    fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderYellow, 1, &fragmentShaderSourceYellow, nullptr);
+    glCompileShader(fragmentShaderYellow);
+
+    glGetShaderiv(fragmentShaderYellow, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShaderYellow, 512, nullptr, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT_YELLOW::COMPILATION_FAILED\n"
+            << infoLog << '\n';
+    }
+
+    // shader program yellow creation
+    unsigned int shaderProgramYellow;
+    shaderProgramYellow = glCreateProgram();
+    glAttachShader(shaderProgramYellow, vertexShader);
+    glAttachShader(shaderProgramYellow, fragmentShaderYellow);
+    glLinkProgram(shaderProgramYellow);
+
+    glGetProgramiv(shaderProgramYellow, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM_YELLOW::LINKING_FAILED\n"
+            << infoLog << '\n';
+    }
+    // delete shaders
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShaderYellow);
 
     float vertices[] = {
             -0.25f, -0.25f, 0.0f,
@@ -139,10 +176,10 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-
         glBindVertexArray(vaoLeft);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        glUseProgram(shaderProgramYellow);
         glBindVertexArray(vaoRight);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -155,6 +192,7 @@ int main()
     glDeleteVertexArrays(1, &vaoLeft);
     glDeleteVertexArrays(1, &vaoRight);
     glDeleteProgram(shaderProgram);
+    glDeleteProgram(shaderProgramYellow);
 
     glfwTerminate();
 }
