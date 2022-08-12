@@ -10,23 +10,27 @@ void processInput(GLFWwindow* window);
 
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
+                                 "out vec4 vertexColor;"
                                  "void main()\n"
                                  "{\n"
-                                 "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                 "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
+                                 "  vertexColor = vec4(0.5f, 0.7f, 0.9f, 1.0f);\n"
                                  "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
+                                   "in vec4 vertexColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "  FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "  FragColor = vertexColor;\n"
                                    "}\0";
 
 const char* fragmentShaderSourceYellow = "#version 330 core\n"
                                          "out vec4 FragColor;\n"
+                                         "uniform vec4 ourColor;\n"
                                          "void main()\n"
                                          "{\n"
-                                         "  FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                         "  FragColor = ourColor;\n"
                                          "}\0";
 
 int main()
@@ -179,7 +183,11 @@ int main()
         glBindVertexArray(vaoLeft);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        const auto time = glfwGetTime();
+        float greenValue = (sin(time) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgramYellow, "ourColor");
         glUseProgram(shaderProgramYellow);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(vaoRight);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
