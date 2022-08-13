@@ -35,7 +35,12 @@ int main()
     }
 
     Shader shaderProgram("shader.vert", "interpolated.frag");
+    shaderProgram.use();
+    shaderProgram.setFloat("horizontalOffset", 1.0f);
+
     Shader shaderProgramAnimated("shader.vert", "animated.frag");
+    shaderProgramAnimated.use();
+    shaderProgramAnimated.setFloat("horizontalOffset", -1.0f);
 
     float vertices[] = {
             -0.25f, -0.25f, 0.0f, 1.0f, 0.0f, 0.0f,
