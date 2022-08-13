@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <cmath>
 #include <iostream>
 
 #include "common/shader.hpp"
@@ -96,7 +97,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         const auto time = glfwGetTime();
-        float greenValue = (sin(time) / 2.0f) + 0.5f;
+        float greenValue = (std::sin(time) / 2.0f) + 0.5f;
         shaderProgramAnimated.use();
         shaderProgramAnimated.setFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(vaoRight);

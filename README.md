@@ -31,6 +31,7 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 ```shell
 ./vcpkg install glad:x64-linux
 ./vcpkg install glfw3:x64-linux
+./vcpkg install stb:x64-linux
 ```
 
 ### CLion
