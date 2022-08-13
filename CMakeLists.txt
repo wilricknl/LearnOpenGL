@@ -12,7 +12,7 @@ if (MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-include_directories(include ${GLAD_INCLUDE_DIRS})
+include_directories(include ${GLAD_INCLUDE_DIRS} ${STB_INCLUDE_DIRS})
 
 find_package(glad REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
@@ -21,3 +21,4 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(common)
 add_subdirectory(hello_window)
 add_subdirectory(triangle)
+add_subdirectory(textures)

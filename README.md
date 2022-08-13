@@ -52,6 +52,7 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 ```shell
 vcpkg.exe install glad:x64-windows-static
 vcpkg.exe install glfw3:x64-windows-static
+vcpkg.exe install stb:x64-windows-static
 ```
 
 ### Visual Studio 2022
