@@ -18,5 +18,6 @@ find_package(glad REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
+add_subdirectory(common)
 add_subdirectory(hello_window)
 add_subdirectory(triangle)
