@@ -10,5 +10,5 @@ out vec4 vertexColor;
 void main()
 {
   gl_Position = vec4(aPos.x + horizontalOffset, aPos.y * -1.0f, aPos.z, 1.0f);
-  vertexColor = vec4(aColor.xyz, 1.0f);
+  vertexColor = vec4(aPos.x + horizontalOffset, aPos.y * -1.0f, aPos.z, 1.0f);
 }
