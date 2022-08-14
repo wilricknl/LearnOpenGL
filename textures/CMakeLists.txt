@@ -11,6 +11,6 @@ add_custom_command(
             ${CMAKE_CURRENT_SOURCE_DIR}/shader.vert
             ${CMAKE_CURRENT_BINARY_DIR}/shader.vert
         COMMAND ${CMAKE_COMMAND} -E copy
-            ${PROJECT_SOURCE_DIR}/assets/textures/wall.jpg
-            ${CMAKE_CURRENT_BINARY_DIR}/wall.jpg
+            ${PROJECT_SOURCE_DIR}/assets/textures/container.jpg
+            ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
 )

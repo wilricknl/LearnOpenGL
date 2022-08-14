@@ -38,19 +38,28 @@ int main()
     Shader shaderProgram("shader.vert", "shader.frag");
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.5f, 1.0f
+            0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
     };
 
-    unsigned int vbo;
+    unsigned int indices[] = {
+            0, 1, 3,
+            1, 2, 3
+    };
+
+    unsigned int vbo, vao, ebo;
+    glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glBindVertexArray(vao);
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -68,7 +77,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, nrChannels;
-    unsigned char* data = stbi_load("wall.jpg", &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -76,7 +85,7 @@ int main()
     }
     else
     {
-        std::cout << "Failed to load 'wall.jpg'!\n";
+        std::cout << "Failed to load 'container.jpg'!\n";
     }
     stbi_image_free(data);
 
@@ -93,7 +102,8 @@ int main()
         shaderProgram.use();
         glBindVertexArray(vao);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+//        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -101,6 +111,8 @@ int main()
 
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
+    glDeleteProgram(shaderProgram.getId());
 
     glfwTerminate();
 }
