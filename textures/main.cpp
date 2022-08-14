@@ -126,6 +126,20 @@ int main()
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     unsigned int transformLocation = glGetUniformLocation(shaderProgram.getId(), "transform");
+    glm::mat4 trans = glm::mat4(1.0f);
+    glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    int modelLocation = glGetUniformLocation(shaderProgram.getId(), "model");
+
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    int viewLocation = glGetUniformLocation(shaderProgram.getId(), "view");
+
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.f), 800.0f / 600.0f, 0.1f, 100.0f);
+    int projectionLocation = glGetUniformLocation(shaderProgram.getId(), "projection");
 
     while (!glfwWindowShouldClose(window))
     {
@@ -135,11 +149,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         shaderProgram.use();
-        const auto time = (float)glfwGetTime();
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, time, glm::vec3(0.0f, 0.0f, 1.0f));
-        glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
 
         shaderProgram.setFloat("mixValue", mixValue);
         glBindVertexArray(vao);
@@ -147,13 +159,6 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-        trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-        const float scale = std::abs(std::sin(time));
-        trans = glm::scale(trans, glm::vec3(scale, scale, 1.0f));
-        glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         glfwSwapBuffers(window);
