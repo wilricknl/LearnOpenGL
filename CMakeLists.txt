@@ -16,6 +16,7 @@ include_directories(include ${GLAD_INCLUDE_DIRS} ${STB_INCLUDE_DIRS})
 
 find_package(glad REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
 
 add_subdirectory(common)

@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <stb_image.h>
 
 #include <algorithm>
@@ -122,6 +125,8 @@ int main()
     // draw wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    unsigned int transformLocation = glGetUniformLocation(shaderProgram.getId(), "transform");
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -130,6 +135,11 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         shaderProgram.use();
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+
         shaderProgram.setFloat("mixValue", mixValue);
         glBindVertexArray(vao);
         glActiveTexture(GL_TEXTURE0);

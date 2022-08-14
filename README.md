@@ -29,9 +29,7 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 ### Install libraries
 
 ```shell
-./vcpkg install glad:x64-linux
-./vcpkg install glfw3:x64-linux
-./vcpkg install stb:x64-linux
+./vcpkg install glad glfw3 glm stb --triplet=x64-linux
 ```
 
 ### CLion
@@ -42,18 +40,16 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 
 ### Configure vcpkg in CLion
 
-1. Go to `File -> Settings -> Build, Execution, Deployment -> CMake`
-2. Find `CMake Options`
-3. Insert `-DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake`
+1. Go to `File -> Settings -> Build, Execution, Deployment -> CMake`.
+2. Find `CMake Options`.
+3. Insert `-DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake`.
 
 # Windows
 
 ### Install libraries
 
 ```shell
-vcpkg.exe install glad:x64-windows-static
-vcpkg.exe install glfw3:x64-windows-static
-vcpkg.exe install stb:x64-windows-static
+vcpkg.exe install glad glfw3 glm stb --triplet=x64-windows-static
 ```
 
 ### Visual Studio 2022
