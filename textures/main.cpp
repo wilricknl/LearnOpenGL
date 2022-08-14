@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
+#include <algorithm>
 #include <iostream>
 
 #include "common/shader.hpp"
@@ -9,6 +10,8 @@
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+
+float mixValue;
 
 int main()
 {
@@ -37,10 +40,10 @@ int main()
     Shader shaderProgram("shader.vert", "shader.frag");
 
     float vertices[] = {
-            0.5f, 0.5f, 0.0f, 0.55f, 0.55f,
-            0.5f, -0.5f, 0.0f, 0.55f, 0.45f,
-            -0.5f, -0.5f, 0.0f, 0.45f, 0.45f,
-            -0.5f, 0.5f, 0.0f, 0.45f, 0.55f,
+            0.5f, 0.5f, 0.0f, 2.0f, 2.0f,
+            0.5f, -0.5f, 0.0f, 2.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            -0.5f, 0.5f, 0.0f, 0.0f, 2.0f,
     };
 
     unsigned int indices[] = {
@@ -99,6 +102,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    stbi_set_flip_vertically_on_load(true);
     data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
     if (data)
     {
@@ -126,13 +130,13 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         shaderProgram.use();
+        shaderProgram.setFloat("mixValue", mixValue);
         glBindVertexArray(vao);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-//        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -156,5 +160,15 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        mixValue += 0.0005f;
+        mixValue = std::max(0.0f, std::min(1.0f, mixValue));
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        mixValue -= 0.0005f;
+        mixValue = std::max(0.0f, std::min(1.0f, mixValue));
     }
 }
