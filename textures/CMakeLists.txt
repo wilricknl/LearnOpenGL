@@ -13,4 +13,7 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/assets/textures/container.jpg
             ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${PROJECT_SOURCE_DIR}/assets/textures/awesomeface.png
+            ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
 )
