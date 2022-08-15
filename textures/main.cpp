@@ -14,6 +14,8 @@
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+float forward = 0.0f;
+float right = 0.0f;
 float fov = 45.0f;
 float horizontal = 800.0f;
 float vertical = 600.0f;
@@ -208,7 +210,7 @@ int main()
         for (unsigned int i = 0; i < 10; ++i)
         {
             glm::mat4 model(1.0f);
-            model = glm::translate(model, cubePositions[i]);
+            model = glm::translate(model, cubePositions[i] + glm::vec3(right, 0.0f, forward));
             float angle = (float)glfwGetTime() * (1.0f + (float)i);
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
@@ -270,5 +272,21 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
     {
         vertical -= 10.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        forward += 0.1f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        forward -= 0.1f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        right -= 0.1f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        right += 0.1f;
     }
 }
