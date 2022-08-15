@@ -14,6 +14,9 @@
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+float fov = 45.0f;
+float horizontal = 800.0f;
+float vertical = 600.0f;
 float mixValue = 0.5f;
 
 int main()
@@ -23,7 +26,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    auto* window = glfwCreateWindow(800, 600, "Hello, OpenGL!", nullptr, nullptr);
+    auto* window = glfwCreateWindow(horizontal, vertical, "Hello, OpenGL!", nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create the window\n";
@@ -179,7 +182,6 @@ int main()
     int viewLocation = glGetUniformLocation(shaderProgram.getId(), "view");
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.f), 800.0f / 600.0f, 0.1f, 100.0f);
     int projectionLocation = glGetUniformLocation(shaderProgram.getId(), "projection");
 
     glEnable(GL_DEPTH_TEST);
@@ -193,6 +195,7 @@ int main()
 
         shaderProgram.use();
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+		projection = glm::perspective(glm::radians(fov), horizontal / vertical, 0.1f, 100.0f);
         glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
         
         shaderProgram.setFloat("mixValue", mixValue);
@@ -236,12 +239,36 @@ void processInput(GLFWwindow* window)
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
     {
-        mixValue += 0.0005f;
+        mixValue += 0.005f;
         mixValue = std::max(0.0f, std::min(1.0f, mixValue));
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
-        mixValue -= 0.0005f;
+        mixValue -= 0.005f;
         mixValue = std::max(0.0f, std::min(1.0f, mixValue));
+    }
+    if (glfwGetKey(window, GLFW_KEY_KP_7) == GLFW_PRESS)
+    {
+        fov += 1.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
+    {
+        fov -= 1.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
+    {
+        horizontal += 10.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_KP_5) == GLFW_PRESS)
+    {
+        horizontal -= 10.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_KP_9) == GLFW_PRESS)
+    {
+        vertical += 10.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
+    {
+        vertical -= 10.0f;
     }
 }
