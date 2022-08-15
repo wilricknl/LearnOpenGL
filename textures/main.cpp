@@ -211,8 +211,11 @@ int main()
         {
             glm::mat4 model(1.0f);
             model = glm::translate(model, cubePositions[i] + glm::vec3(right, 0.0f, forward));
-            float angle = (float)glfwGetTime() * (1.0f + (float)i);
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            if (i % 3 == 0)
+            {
+        		float angle = (float)glfwGetTime() * 10.0f;
+				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            }
         	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 			glDrawArrays(GL_TRIANGLES, 0, 36);
         }
