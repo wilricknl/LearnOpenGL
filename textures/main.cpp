@@ -8,27 +8,23 @@
 #include <algorithm>
 #include <iostream>
 
+#include "common/camera.hpp"
 #include "common/shader.hpp"
 #include "config.hpp"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void scrollCallback(GLFWwindow* window, double offsetX, double offsetY);
-void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void mouseCallback(GLFWwindow* window, double positionX, double positionY);
 void processInput(GLFWwindow* window);
 
-float fov = 45.0f;
 float horizontal = 800.0f;
 float vertical = 600.0f;
 float mixValue = 0.5f;
-glm::vec3 cameraPosition{ 0.0f, 0.0f, 3.0f };
-glm::vec3 cameraFront{ 0.0f, 0.0f, -1.0f };
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime;
 float lastFrame;
 float lastMouseX = 400.0f;
 float lastMouseY = 300.0f;
-float yaw;
-float pitch;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 int main()
 {
@@ -211,10 +207,10 @@ int main()
 
         shaderProgram.use();
 
-        view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+        view = camera.GetViewMatrix();
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
 
-		projection = glm::perspective(glm::radians(fov), horizontal / vertical, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
         glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
         
         shaderProgram.setFloat("mixValue", mixValue);
@@ -255,7 +251,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)
 {
-    fov = std::clamp(fov - static_cast<float>(offsetY), 1.0f, 45.0f);
+    camera.ProcessMouseScroll(static_cast<float>(offsetY));
 }
 
 void mouseCallback(GLFWwindow* window, double positionX, double positionY)
@@ -273,18 +269,7 @@ void mouseCallback(GLFWwindow* window, double positionX, double positionY)
     lastMouseX = static_cast<float>(positionX);
     lastMouseY = static_cast<float>(positionY);
 
-    const float sensitivity = 180.0f * deltaTime;
-    offsetX *= sensitivity ;
-    offsetY *= sensitivity;
-
-    yaw += offsetX;
-    pitch = std::clamp(pitch + offsetY, -89.0f, 89.0f);
-
-    glm::vec3 direction;
-    direction.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
-    direction.y = std::sin(glm::radians(pitch));
-    direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    camera.ProcessMouseMovement(offsetX, offsetY);
 }
 
 void processInput(GLFWwindow* window)
@@ -303,11 +288,11 @@ void processInput(GLFWwindow* window)
     }
     if (glfwGetKey(window, GLFW_KEY_KP_7) == GLFW_PRESS)
     {
-        fov += 1.0f;
+        camera.SetFov(camera.GetFov() + 1.0f);
     }
     if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
     {
-        fov -= 1.0f;
+        camera.SetFov(camera.GetFov() - 1.0f);
     }
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
     {
@@ -326,21 +311,20 @@ void processInput(GLFWwindow* window)
         vertical -= 10.0f;
     }
 
-    const float cameraSpeed = 25.0f;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cameraPosition += cameraFront * cameraSpeed * deltaTime;
+        camera.ProcessKeyboard(CameraMovement::Forward, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cameraPosition -= cameraFront * cameraSpeed * deltaTime;
+        camera.ProcessKeyboard(CameraMovement::Backward, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+        camera.ProcessKeyboard(CameraMovement::Right, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+        camera.ProcessKeyboard(CameraMovement::Left, deltaTime);
     }
 }
