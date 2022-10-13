@@ -36,12 +36,12 @@ int main()
     }
 
     Shader shaderProgram("shader.vert", "interpolated.frag");
-    shaderProgram.use();
-    shaderProgram.setFloat("horizontalOffset", 1.0f);
+    shaderProgram.Use();
+    shaderProgram.SetFloat("horizontalOffset", 1.0f);
 
     Shader shaderProgramAnimated("shader.vert", "animated.frag");
-    shaderProgramAnimated.use();
-    shaderProgramAnimated.setFloat("horizontalOffset", -1.0f);
+    shaderProgramAnimated.Use();
+    shaderProgramAnimated.SetFloat("horizontalOffset", -1.0f);
 
     float vertices[] = {
             -0.25f, -0.25f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -92,14 +92,14 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shaderProgram.use();
+        shaderProgram.Use();
         glBindVertexArray(vaoLeft);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         const auto time = glfwGetTime();
         float greenValue = (std::sin(time) / 2.0f) + 0.5f;
-        shaderProgramAnimated.use();
-        shaderProgramAnimated.setFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+        shaderProgramAnimated.Use();
+        shaderProgramAnimated.SetFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(vaoRight);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 

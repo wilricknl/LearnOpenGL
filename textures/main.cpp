@@ -172,31 +172,19 @@ int main()
     }
     stbi_image_free(data);
 
-    shaderProgram.use();
-    shaderProgram.setInt("texture1", 0);
-    shaderProgram.setInt("texture2", 1);
+    shaderProgram.Use();
+    shaderProgram.SetInt("texture1", 0);
+    shaderProgram.SetInt("texture2", 1);
+    shaderProgram.SetMat4("transform", glm::mat4(1.0f));
 
     // draw wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    unsigned int transformLocation = glGetUniformLocation(shaderProgram.getId(), "transform");
-    glm::mat4 trans = glm::mat4(1.0f);
-    glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
-
-    int modelLocation = glGetUniformLocation(shaderProgram.getId(), "model");
-
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    int viewLocation = glGetUniformLocation(shaderProgram.getId(), "view");
-
-    glm::mat4 projection;
-    int projectionLocation = glGetUniformLocation(shaderProgram.getId(), "projection");
 
     glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
     {
-        float currentTime = static_cast<float>(glfwGetTime());
+        const auto currentTime = static_cast<float>(glfwGetTime());
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
 
@@ -205,15 +193,12 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shaderProgram.use();
+        shaderProgram.Use();
+        shaderProgram.SetMat4("view", camera.GetViewMatrix());
+        glm::mat4 projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
+        shaderProgram.SetMat4("projection", projection);
+        shaderProgram.SetFloat("mixValue", mixValue);
 
-        view = camera.GetViewMatrix();
-        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-
-		projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
-        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
-        
-        shaderProgram.setFloat("mixValue", mixValue);
         glBindVertexArray(vao);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -229,7 +214,7 @@ int main()
         		float angle = (float)glfwGetTime() * 10.0f;
 				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             }
-        	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+            shaderProgram.SetMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
@@ -239,7 +224,7 @@ int main()
 
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
-    glDeleteProgram(shaderProgram.getId());
+    glDeleteProgram(shaderProgram.GetId());
 
     glfwTerminate();
 }
