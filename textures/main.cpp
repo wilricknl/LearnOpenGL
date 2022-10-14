@@ -273,27 +273,27 @@ void processInput(GLFWwindow* window)
     }
     if (glfwGetKey(window, GLFW_KEY_KP_7) == GLFW_PRESS)
     {
-        camera.SetFov(camera.GetFov() + 1.0f);
+        camera.SetFov(camera.GetFov() + 45.0f * deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
     {
-        camera.SetFov(camera.GetFov() - 1.0f);
+        camera.SetFov(camera.GetFov() - 45.0f * deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
     {
-        horizontal += 10.0f;
+        horizontal += 1000.0f * deltaTime;
     }
     if (glfwGetKey(window, GLFW_KEY_KP_5) == GLFW_PRESS)
     {
-        horizontal -= 10.0f;
+        horizontal -= 1000.0f * deltaTime;
     }
     if (glfwGetKey(window, GLFW_KEY_KP_9) == GLFW_PRESS)
     {
-        vertical += 10.0f;
+        vertical += 1000.0f * deltaTime;
     }
     if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
     {
-        vertical -= 10.0f;
+        vertical -= 1000.0f * deltaTime;
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
