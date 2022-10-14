@@ -312,4 +312,8 @@ void processInput(GLFWwindow* window)
     {
         camera.ProcessKeyboard(CameraMovement::Left, deltaTime);
     }
+
+    // lock the vertical axis to 0
+    const auto& position = camera.GetPosition();
+    camera.SetPosition({ position.x, 0.0f, position.z });
 }
