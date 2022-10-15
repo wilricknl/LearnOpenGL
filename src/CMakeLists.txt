@@ -1,0 +1,5 @@
+add_subdirectory(common)
+add_subdirectory(hello_window)
+add_subdirectory(triangle)
+add_subdirectory(textures)
+add_subdirectory(lighting)
