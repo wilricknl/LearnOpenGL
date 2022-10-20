@@ -144,9 +144,16 @@ int main()
         glm::vec3 lightPosition(2.0f * std::cos(timePosition), 1.25f, 2.0f * std::sin(timePosition));
 
         cubeShader.Use();
-        cubeShader.SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        cubeShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        cubeShader.SetVec3("lightPosition", lightPosition);
+        cubeShader.SetVec3("viewPosition", camera.GetPosition());
+        cubeShader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        cubeShader.SetVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        cubeShader.SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        cubeShader.SetFloat("material.shininess", 32.0f);
+
+        cubeShader.SetVec3("light.position", lightPosition);
+        cubeShader.SetVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        cubeShader.SetVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        cubeShader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
         const auto view = camera.GetViewMatrix();
