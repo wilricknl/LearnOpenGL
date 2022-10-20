@@ -22,4 +22,7 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E copy
             ${PROJECT_SOURCE_DIR}/assets/textures/container2_specular.png
             ${CMAKE_CURRENT_BINARY_DIR}/container2_specular.png
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${PROJECT_SOURCE_DIR}/assets/textures/matrix.jpg
+        ${CMAKE_CURRENT_BINARY_DIR}/matrix.jpg
 )

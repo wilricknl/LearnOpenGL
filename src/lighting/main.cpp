@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <stb_image.h>
 
 #include <iostream>
@@ -37,7 +36,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    auto* window = glfwCreateWindow(horizontal, vertical, "Hello, OpenGL!", nullptr, nullptr);
+    auto* window = glfwCreateWindow((int)horizontal, (int)vertical, "Hello, OpenGL!", nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create the window\n";
@@ -115,7 +114,7 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
@@ -167,6 +166,28 @@ int main()
     }
     stbi_image_free(data);
 
+    // emmision map loading
+    unsigned int emmisionMap;
+    glGenTextures(1, &emmisionMap);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, emmisionMap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    data = stbi_load("matrix.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load 'matrix.jpg'!\n";
+    }
+    stbi_image_free(data);
+
     // light vao
     unsigned int lightVao;
     glGenVertexArrays(1, &lightVao);
@@ -197,6 +218,7 @@ int main()
         cubeShader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
         cubeShader.SetInt("material.diffuse", 0);
         cubeShader.SetInt("material.specular", 1);
+        cubeShader.SetInt("material.emmision", 2);
         cubeShader.SetFloat("material.shininess", 32.0f);
 
         cubeShader.SetVec3("light.position", lightPosition);
