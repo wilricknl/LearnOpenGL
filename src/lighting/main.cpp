@@ -147,7 +147,6 @@ int main()
         cubeShader.SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
         cubeShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
         cubeShader.SetVec3("lightPosition", lightPosition);
-        cubeShader.SetVec3("viewPosition", camera.GetPosition());
 
         const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
         const auto view = camera.GetViewMatrix();
