@@ -16,4 +16,10 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/shader.vert
             ${CMAKE_CURRENT_BINARY_DIR}/shader.vert
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${PROJECT_SOURCE_DIR}/assets/textures/container2.png
+            ${CMAKE_CURRENT_BINARY_DIR}/container2.png
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${PROJECT_SOURCE_DIR}/assets/textures/container2_specular.png
+            ${CMAKE_CURRENT_BINARY_DIR}/container2_specular.png
 )
