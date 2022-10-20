@@ -138,7 +138,10 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::vec3 lightPosition(-1.2f, 1.0f, -2.0f);
+        // multiplying the radians causes rotation to go faster
+        auto timePosition = 25.0f * static_cast<float>(glm::radians(glfwGetTime()));
+        // multiplying sin or cos causes position to shift
+        glm::vec3 lightPosition(2.0f * std::cos(timePosition), 1.25f, 2.0f * std::sin(timePosition));
 
         cubeShader.Use();
         cubeShader.SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
