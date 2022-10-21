@@ -29,7 +29,7 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 ### Install libraries
 
 ```shell
-./vcpkg install glad glfw3 glm stb --triplet=x64-linux
+./vcpkg install assimp glad glfw3 glm stb --triplet=x64-linux
 ```
 
 ### CLion
@@ -49,7 +49,7 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 ### Install libraries
 
 ```shell
-vcpkg.exe install glad glfw3 glm stb --triplet=x64-windows-static
+vcpkg.exe install assimp glad glfw3 glm stb --triplet=x64-windows-static
 ```
 
 ### Visual Studio 2022
