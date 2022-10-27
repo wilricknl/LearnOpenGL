@@ -59,10 +59,14 @@ int main()
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     stbi_set_flip_vertically_on_load(true);
 
     Shader shader{ "shader.vert", "shader.frag" };
+    Shader shaderOutline{ "shader.vert", "outline.frag" };
     Model cube{ "cube/cube.obj" };
     Model plane{ "plane/plane.obj" };
 
@@ -75,7 +79,7 @@ int main()
         processInput(window);
 
         glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         shader.Use();
 
@@ -84,19 +88,50 @@ int main()
         shader.SetMat4("projection", projection);
         shader.SetMat4("view", view);
 
+        glStencilMask(0x00);
         glm::mat4 model = glm::mat4(1.0f);
         shader.SetMat4("model", model);
         plane.Draw(shader);
 
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+
+    	model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, 1.0f, -1.0f));
         shader.SetMat4("model", model);
         cube.Draw(shader);
 
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
         shader.SetMat4("model", model);
         cube.Draw(shader);
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        float scale = 1.05f;
+
+        shaderOutline.Use();
+        shaderOutline.SetMat4("projection", projection);
+        shaderOutline.SetMat4("view", view);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, 1.0f, -1.0f));
+        model = glm::scale(model, glm::vec3(scale, scale, scale));
+        shaderOutline.SetMat4("model", model);
+        cube.Draw(shaderOutline);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(scale, scale, scale));
+        shaderOutline.SetMat4("model", model);
+        cube.Draw(shaderOutline);
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glEnable(GL_DEPTH_TEST);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
