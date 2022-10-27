@@ -44,11 +44,11 @@ void Model::Draw(
 {
     if (bOutline)
     {
-        Draw(shader, model, view, projection);
+        DrawOutline(shader, outline, model, view, projection);
     }
     else
     {
-        DrawOutline(shader, outline, model, view, projection);
+        Draw(shader, model, view, projection);
     }
 }
 
@@ -76,6 +76,17 @@ void Model::DrawOutline(
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
     glEnable(GL_DEPTH_TEST);
+}
+
+void Model::SetTextureWrap(int wrap) const
+{
+	for (auto& texture : m_loadedTextures)
+	{
+        glBindTexture(GL_TEXTURE_2D, texture.GetId());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 void Model::LoadModel(const std::string& path)

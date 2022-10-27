@@ -17,6 +17,9 @@ add_custom_command(
         ${PROJECT_SOURCE_DIR}/assets/models/cube
         ${CMAKE_CURRENT_BINARY_DIR}/cube
     COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/assets/models/grass
+        ${CMAKE_CURRENT_BINARY_DIR}/grass/
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/assets/models/plane
         ${CMAKE_CURRENT_BINARY_DIR}/plane/
 )

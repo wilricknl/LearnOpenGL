@@ -19,24 +19,30 @@ public:
     Model(const std::string& path);
 
     [[deprecated]] void Draw(Shader& shader);
-    void Draw(
+
+	void Draw(
         Shader& shader, 
 		const glm::mat4& model,
         const glm::mat4& view,
         const glm::mat4& projection);
-    void Draw(
+
+	void Draw(
         Shader& shader,
         Shader& outline,
         const glm::mat4& model,
         const glm::mat4& view,
         const glm::mat4& projection,
         bool bOutline);
-    void DrawOutline(
+
+	void DrawOutline(
         Shader& shader, 
         Shader& outline,
         glm::mat4 model,
         const glm::mat4& view,
         const glm::mat4& projection);
+
+    void SetTextureWrap(int wrap) const;
+
 protected:
     void LoadModel(const std::string& path);
     void ProcessNode(aiNode* node, const aiScene* scene);

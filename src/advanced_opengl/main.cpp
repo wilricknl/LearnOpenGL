@@ -67,6 +67,7 @@ int main()
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilMask(0x00);
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -74,6 +75,17 @@ int main()
     Shader shaderOutline{ "shader.vert", "outline.frag" };
     Model cube{ "cube/cube.obj" };
     Model plane{ "plane/plane.obj" };
+    Model grass{ "grass/grass.obj" };
+    grass.SetTextureWrap(GL_CLAMP_TO_EDGE);
+
+    std::vector<glm::vec3> grassPositions
+    {
+        glm::vec3(-2.5f, 1.0f, -2.48f),
+        glm::vec3(2.5f, 1.0f, 3.51f),
+        glm::vec3(0.0f, 1.0f, 2.7f),
+        glm::vec3(-0.3f, 1.0f, -4.3f),
+        glm::vec3(5.5f, 1.0f, -0.6f)
+    };
 
     while (!glfwWindowShouldClose(window))
     {
@@ -91,11 +103,17 @@ int main()
         plane.Draw(shader, glm::mat4(1.0f), view, projection);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 1.0f, -1.0f));
-		cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
+        for (const auto& position : grassPositions)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, position);
+            grass.Draw(shader, model, view, projection);
+        }
 
         model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+		cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
+
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
         cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
