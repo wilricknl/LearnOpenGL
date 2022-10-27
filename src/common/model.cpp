@@ -1,9 +1,10 @@
 #include "common/model.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
 
 Model::Model(const std::string& path)
-    : m_meshes(), m_directory()
+    : m_outlineScale(1.05f), m_meshes(), m_directory()
 {
     LoadModel(path);
 }
@@ -14,6 +15,67 @@ void Model::Draw(Shader& shader)
     {
         mesh.Draw(shader);
     }
+}
+
+
+void Model::Draw(
+    Shader& shader,
+    const glm::mat4& model,
+    const glm::mat4& view,
+    const glm::mat4& projection)
+{
+    shader.Use();
+    shader.SetMat4("model", model);
+    shader.SetMat4("view", view);
+    shader.SetMat4("projection", projection);
+    for (auto& mesh : m_meshes)
+    {
+        mesh.Draw(shader);
+    }
+}
+
+void Model::Draw(
+    Shader& shader,
+    Shader& outline,
+    const glm::mat4& model,
+    const glm::mat4& view,
+    const glm::mat4& projection,
+    bool bOutline)
+{
+    if (bOutline)
+    {
+        Draw(shader, model, view, projection);
+    }
+    else
+    {
+        DrawOutline(shader, outline, model, view, projection);
+    }
+}
+
+void Model::DrawOutline(
+    Shader& shader, 
+    Shader& outline,
+    glm::mat4 model,
+    const glm::mat4& view,
+    const glm::mat4& projection)
+{
+    // todo: note for future me, uncomment this if you don't want to combine outlines
+    // glClear(GL_STENCIL_BUFFER_BIT);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
+    Draw(shader, model, view, projection);
+
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    glDisable(GL_DEPTH_TEST);
+
+    model = glm::scale(model, glm::vec3(m_outlineScale));
+    Draw(outline, model, view, projection);
+
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Model::LoadModel(const std::string& path)
@@ -131,4 +193,14 @@ std::vector<Texture> Model::LoadMaterialTextures(
     }
 
     return textures;
+}
+
+float Model::GetOutlineScale() const
+{
+    return m_outlineScale;
+}
+
+void Model::SetOutlineScale(float outlineScale)
+{
+    m_outlineScale = outlineScale;
 }

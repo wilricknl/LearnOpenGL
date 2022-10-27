@@ -12,6 +12,7 @@ Useful tutorials to quickly create some models with Blender:
 | Key      | Description               |
 |----------|---------------------------|
 | Escape   | Exit program.             |
+| O        | Toggle outlines.          |
 | W        | Move camera forward.      |
 | S        | Move camera backward.     |
 | D        | Move camera to the right. |

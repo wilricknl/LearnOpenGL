@@ -14,6 +14,7 @@
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void scrollCallback(GLFWwindow* window, double offsetX, double offsetY);
 void mouseCallback(GLFWwindow* window, double positionX, double positionY);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
 
 // screen
@@ -29,6 +30,9 @@ Camera camera(glm::vec3(0.0f, 1.0f, 3.0f));
 // timing
 float deltaTime;
 float lastFrame;
+
+// outline
+bool bOutline = false;
 
 int main()
 {
@@ -50,6 +54,7 @@ int main()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetScrollCallback(window, scrollCallback);
+    glfwSetKeyCallback(window, keyCallback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -81,57 +86,19 @@ int main()
         glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        shader.Use();
-
         const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
         const auto view = camera.GetViewMatrix();
-        shader.SetMat4("projection", projection);
-        shader.SetMat4("view", view);
+        plane.Draw(shader, glm::mat4(1.0f), view, projection);
 
-        glStencilMask(0x00);
         glm::mat4 model = glm::mat4(1.0f);
-        shader.SetMat4("model", model);
-        plane.Draw(shader);
-
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
-    	model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 1.0f, -1.0f));
-        shader.SetMat4("model", model);
-        cube.Draw(shader);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
-        shader.SetMat4("model", model);
-        cube.Draw(shader);
-
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
-
-        float scale = 1.05f;
-
-        shaderOutline.Use();
-        shaderOutline.SetMat4("projection", projection);
-        shaderOutline.SetMat4("view", view);
-
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.0f, 1.0f, -1.0f));
-        model = glm::scale(model, glm::vec3(scale, scale, scale));
-        shaderOutline.SetMat4("model", model);
-        cube.Draw(shaderOutline);
+		cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
 
         model = glm::mat4(1.0f);
+        model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(scale, scale, scale));
-        shaderOutline.SetMat4("model", model);
-        cube.Draw(shaderOutline);
-
-        glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
-        glEnable(GL_DEPTH_TEST);
+        cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -167,12 +134,20 @@ void mouseCallback(GLFWwindow* window, double positionX, double positionY)
     camera.ProcessMouseMovement(offsetX, offsetY);
 }
 
-void processInput(GLFWwindow* window)
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
+	if (key == GLFW_KEY_O && action == GLFW_PRESS)
+	{
+        bOutline = !bOutline;
+	}
+}
+
+void processInput(GLFWwindow* window)
+{
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         camera.ProcessKeyboard(CameraMovement::Forward, deltaTime);
