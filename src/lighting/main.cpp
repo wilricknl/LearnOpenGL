@@ -106,6 +106,20 @@ int main()
         -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
     };
 
+    constexpr int cubePositionsSize = 10;
+        glm::vec3 cubePositions[cubePositionsSize] {
+        glm::vec3(0.0f,  0.0f,  0.0f),
+        glm::vec3(2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f,  2.0f, -2.5f),
+        glm::vec3(1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     unsigned int vbo, cubeVao;
     glGenVertexArrays(1, &cubeVao);
     glGenBuffers(1, &vbo);
@@ -166,28 +180,6 @@ int main()
     }
     stbi_image_free(data);
 
-    // emmision map loading
-    unsigned int emmisionMap;
-    glGenTextures(1, &emmisionMap);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, emmisionMap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    data = stbi_load("matrix.jpg", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load 'matrix.jpg'!\n";
-    }
-    stbi_image_free(data);
-
     // light vao
     unsigned int lightVao;
     glGenVertexArrays(1, &lightVao);
@@ -208,20 +200,14 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // multiplying the radians causes rotation to go faster
-        auto timePosition = 25.0f * static_cast<float>(glm::radians(glfwGetTime()));
-        // multiplying sin or cos causes position to shift
-        glm::vec3 lightPosition(2.0f * std::cos(timePosition), 1.25f, 2.0f * std::sin(timePosition));
-
         cubeShader.Use();
         cubeShader.SetVec3("viewPosition", camera.GetPosition());
         cubeShader.SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
         cubeShader.SetInt("material.diffuse", 0);
         cubeShader.SetInt("material.specular", 1);
-        cubeShader.SetInt("material.emmision", 2);
         cubeShader.SetFloat("material.shininess", 32.0f);
 
-        cubeShader.SetVec3("light.position", lightPosition);
+        cubeShader.SetVec3("light.direction", -0.2f, -1.0f, -0.3f);
         cubeShader.SetVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         cubeShader.SetVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         cubeShader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
@@ -231,21 +217,15 @@ int main()
         auto model = glm::mat4(1.0f);
         cubeShader.SetMat4("projection", projection);
         cubeShader.SetMat4("view", view);
-        cubeShader.SetMat4("model", model);
 
         glBindVertexArray(cubeVao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        lightShader.Use();
-        lightShader.SetMat4("projection", projection);
-        lightShader.SetMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPosition);
-        model = glm::scale(model, glm::vec3(0.2f));
-        lightShader.SetMat4("model", model);
-
-        glBindVertexArray(lightVao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (size_t i = 0; i < cubePositionsSize; ++i)
+        {
+            model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+            model = glm::rotate(model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
+            cubeShader.SetMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
