@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <filesystem>
+#include <map>
 
 #include "common/camera.hpp"
 #include "common/model.hpp"
@@ -63,6 +64,8 @@ int main()
         return -1;
     }
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -102,21 +105,28 @@ int main()
         const auto view = camera.GetViewMatrix();
         plane.Draw(shader, glm::mat4(1.0f), view, projection);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        for (const auto& position : grassPositions)
-        {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, position);
-            grass.Draw(shader, model, view, projection);
-        }
-
-        model = glm::mat4(1.0f);
+        glm::mat4 model = glm::mat4(1.0f); model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
 		cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
         cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
+
+        std::map<float, glm::vec3> sorted;
+        for (const auto& position : grassPositions)
+        {
+            const float distance = glm::length(camera.GetPosition() - position);
+            sorted[distance] = position;
+        }
+
+        // draw furthest away first
+        for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, it->second);
+            grass.Draw(shader, model, view, projection);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
