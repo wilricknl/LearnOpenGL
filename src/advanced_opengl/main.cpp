@@ -65,6 +65,7 @@ int main()
     }
 
     glEnable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
@@ -121,12 +122,14 @@ int main()
         }
 
         // draw furthest away first
+        glDisable(GL_CULL_FACE);
         for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
             model = glm::mat4(1.0f);
             model = glm::translate(model, it->second);
             grass.Draw(shader, model, view, projection);
         }
+        glEnable(GL_CULL_FACE);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
