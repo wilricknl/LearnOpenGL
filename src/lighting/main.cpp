@@ -207,10 +207,14 @@ int main()
         cubeShader.SetInt("material.specular", 1);
         cubeShader.SetFloat("material.shininess", 32.0f);
 
-        cubeShader.SetVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        glm::vec3 lightPosition{ 1.2f, 1.0f, 2.0f };
+        cubeShader.SetVec3("light.position", lightPosition);
         cubeShader.SetVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         cubeShader.SetVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         cubeShader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        cubeShader.SetFloat("light.constant", 1.0f);
+        cubeShader.SetFloat("light.linear", 0.09f);
+        cubeShader.SetFloat("light.quadratic", 0.032f);
 
         const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
         const auto view = camera.GetViewMatrix();
@@ -226,6 +230,18 @@ int main()
             cubeShader.SetMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        // draw light bulb
+        lightShader.Use();
+        lightShader.SetMat4("projection", projection);
+        lightShader.SetMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPosition);
+        model = glm::scale(model, glm::vec3(0.2f));
+        lightShader.SetMat4("model", model);
+
+        glBindVertexArray(lightVao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
