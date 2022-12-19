@@ -60,6 +60,49 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
+
+    // grid begin
+    Shader gridShader{ "grid.vert", "grid.frag" };
+
+    std::vector<float> vertices{
+        -4.0f, 0.0f,  4.0f, // 0
+    	 0.0f, 0.0f,  4.0f, // 1
+         4.0f, 0.0f,  4.0f, // 2
+
+        -4.0f, 0.0f,  0.0f, // 3
+    	 0.0f, 0.0f,  0.0f, // 4
+         4.0f, 0.0f,  0.0f, // 5
+
+        -4.0f, 0.0f, -4.0f, // 6
+    	 0.0f, 0.0f, -4.0f, // 7
+         4.0f, 0.0f, -4.0f  // 8
+    };
+
+    std::vector<unsigned int> indices{
+        0, 1, 1, 2,       // top row                    - -
+        0, 3, 1, 4, 2, 5, // connect top and middle    | | |
+        3, 4, 4, 5,       // middle row                 - -
+        3, 6, 4, 7, 5, 8, // connect middle and bottom | | |
+        6, 7, 7, 8        // bottom row                 - -
+    };
+
+    unsigned int gridVao, gridVbo, gridEbo;
+    glGenVertexArrays(1, &gridVao);
+    glGenBuffers(1, &gridVbo);
+    glGenBuffers(1, &gridEbo);
+    glBindVertexArray(gridVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridEbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+    // grid end
+
+
     stbi_set_flip_vertically_on_load(true);
 
     Shader shader{ "shader.vert", "shader.frag" };
@@ -76,17 +119,30 @@ int main()
         glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader.Use();
-
-        const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
+        // mvc
+    	const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
         const auto view = camera.GetViewMatrix();
+        glm::mat4 model = glm::mat4(1.0f);
+
+        // grid
+        gridShader.Use();
+        gridShader.SetMat4("projection", projection);
+        gridShader.SetMat4("view", view);
+        gridShader.SetMat4("model", model);
+
+    	glBindVertexArray(gridVao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridEbo);
+        glDrawElements(GL_LINES, (GLsizei)indices.size(), GL_UNSIGNED_INT, nullptr);
+
+        // backpack
+    	shader.Use();
+
         shader.SetMat4("projection", projection);
         shader.SetMat4("view", view);
-
-        glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         shader.SetMat4("model", model);
+
         backpack.Draw(shader);
 
         glfwSwapBuffers(window);
