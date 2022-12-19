@@ -1,0 +1,13 @@
+{
+  "name": "learn-opengl",
+  "description": "Cross-platform CMake follow along with LearnOpenGL ",
+  "version": "1.0.0",
+  "dependencies": [
+    "assimp",
+    "freetype",
+    "glad",
+    "glm",
+    "glfw3",  
+    "stb"
+  ]
+}

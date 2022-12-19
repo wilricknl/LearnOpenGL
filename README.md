@@ -8,11 +8,9 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
     - [Table of Contents](#table-of-contents)
 - [Requirements](#requirements)
 - [Linux](#linux)
-    - [Install libraries](#install-libraries)
     - [CLion](#clion)
     - [Configure vcpkg in CLion](#configure-vcpkg-in-clion)
 - [Windows](#windows)
-    - [Install libraries](#install-libraries-1)
     - [Visual Studio 2022](#visual-studio-2022)
     - [Configure vcpkg in Visual Studio 2022](#configure-vcpkg-in-visual-studio-2022)
 
@@ -25,12 +23,6 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
   on Windows. 
 
 # Linux
-
-### Install libraries
-
-```shell
-./vcpkg install assimp glad glfw3 glm stb --triplet=x64-linux
-```
 
 ### CLion
 
@@ -45,12 +37,6 @@ Cross-platform CMake follow along with [LearnOpenGL](https://learnopengl.com/).
 3. Insert `-DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake`.
 
 # Windows
-
-### Install libraries
-
-```shell
-vcpkg.exe install assimp glad glfw3 glm stb --triplet=x64-windows-static
-```
 
 ### Visual Studio 2022
 
