@@ -13,6 +13,12 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/shader.vert
         ${CMAKE_CURRENT_BINARY_DIR}/shader.vert
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/quad.frag
+        ${CMAKE_CURRENT_BINARY_DIR}/quad.frag
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/quad.vert
+        ${CMAKE_CURRENT_BINARY_DIR}/quad.vert
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/assets/models/cube
         ${CMAKE_CURRENT_BINARY_DIR}/cube
