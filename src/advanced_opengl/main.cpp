@@ -131,13 +131,13 @@ int main()
 
     float quadVertices[]
     {
-        -1.0f,  1.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, 1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f, // left top
+        -1.0f, -1.0f, 0.0f, 0.0f, // left bottom
+         1.0f, -1.0f, 1.0f, 0.0f, // right bottom
 
-        -1.0f,  1.0f, 0.0f, 1.0f,
-         1.0f, -1.0f, 1.0f, 0.0f,
-         1.0f,  1.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f, // left top
+         1.0f, -1.0f, 1.0f, 0.0f, // right bottom
+         1.0f,  1.0f, 1.0f, 1.0f, // right top
     };
 
     unsigned int quadVao, quadVbo;
@@ -155,6 +155,34 @@ int main()
     // framebuffer end
 
 
+    // mirror
+    float mirrorVertices[]
+    {
+        -0.75f,  1.0f,  0.0f, 1.0f, // left top
+        -0.75f,  0.75f, 0.0f, 0.0f, // left bottom
+         0.75f,  0.75f, 1.0f, 0.0f, // right bottom
+
+        -0.75f,  1.0f,  0.0f, 1.0f, // left top
+         0.75f,  0.75f, 1.0f, 0.0f, // right bottom
+         0.75f,  1.0f,  1.0f, 1.0f, // right top
+    };
+
+    unsigned int mirrorVao, mirrorVbo;
+    glGenVertexArrays(1, &mirrorVao);
+    glGenBuffers(1, &mirrorVbo);
+    glBindVertexArray(mirrorVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mirrorVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sizeof(mirrorVertices), &mirrorVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, nullptr);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(2 * sizeof(float)));
+
+    // mirror end
+
+
 	while (!glfwWindowShouldClose(window))
     {
         const auto currentTime = static_cast<float>(glfwGetTime());
@@ -170,8 +198,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        const auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
-        const auto view = camera.GetViewMatrix();
+        auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100.0f);
+        auto view = camera.GetViewMatrix();
         plane.Draw(shader, glm::mat4(1.0f), view, projection);
 
         glm::mat4 model = glm::mat4(1.0f); model = glm::mat4(1.0f);
@@ -210,6 +238,52 @@ int main()
         glDisable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, texColorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // third pass with custom frame buffer
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+
+        projection = glm::perspective(glm::radians(camera.GetFov()), (0.75f * horizontal) / (vertical * 0.125f), 0.1f, 100.0f);
+        projection = glm::rotate(projection, glm::radians(180.0f), glm::vec3{0.0f, 1.0f, 0.0f });
+        view = camera.GetViewMatrix();
+        plane.Draw(shader, glm::mat4(1.0f), view, projection);
+
+        model = glm::mat4(1.0f); model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+        cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
+        cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
+
+        sorted.clear();
+        for (const auto& position : grassPositions)
+        {
+            const float distance = glm::length(camera.GetPosition() - position);
+            sorted[distance] = position;
+        }
+
+        // draw furthest away first
+        glDisable(GL_CULL_FACE);
+        for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, it->second);
+            grass.Draw(shader, model, view, projection);
+        }
+        glEnable(GL_CULL_FACE);
+
+        // fourth pass with default framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		quadShader.Use();
+        glBindVertexArray(mirrorVao);
+        glDisable(GL_DEPTH_TEST);
+        glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
 
 
         glfwSwapBuffers(window);
