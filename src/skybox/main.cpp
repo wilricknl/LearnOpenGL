@@ -173,29 +173,16 @@ int main()
 
         glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-
 
         auto projection = glm::perspective(glm::radians(camera.GetFov()), horizontal / vertical, 0.1f, 100000.0f);
         auto view = camera.GetViewMatrix();
 
-        // draw skybox
-        glDisable(GL_CULL_FACE);
-        glDepthMask(GL_FALSE);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        skyboxShader.Use();
-        skyboxShader.SetInt("skybox", 0);
-        skyboxShader.SetMat4("projection", projection);
-        skyboxShader.SetMat4("view", view);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glBindVertexArray(skyboxVao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDepthMask(GL_TRUE);
-        glEnable(GL_CULL_FACE);
-
         shader.Use();
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        shader.SetInt("skybox", 4);
+        shader.SetVec3("cameraPos", camera.GetPosition());
+
         plane.Draw(shader, glm::mat4(1.0f), view, projection);
 
         glm::mat4 model = glm::mat4(1.0f); model = glm::mat4(1.0f);
@@ -206,14 +193,30 @@ int main()
         model = glm::translate(model, glm::vec3(2.0f, 1.0f, 0.0f));
         cube.Draw(shader, shaderOutline, model, view, projection, bOutline);
 
-        std::map<float, glm::vec3> sorted;
+
+        // draw skybox
+        glDisable(GL_CULL_FACE);
+        glDepthFunc(GL_LEQUAL);
+        skyboxShader.Use();
+        skyboxShader.SetInt("skybox", 4);
+        skyboxShader.SetMat4("projection", projection);
+        skyboxShader.SetMat4("view", view);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glBindVertexArray(skyboxVao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+
+        // draw sprites
+    	std::map<float, glm::vec3> sorted;
         for (const auto& position : grassPositions)
         {
             const float distance = glm::length(camera.GetPosition() - position);
             sorted[distance] = position;
         }
 
-        // draw furthest away first
+    	// draw furthest away first
         glDisable(GL_CULL_FACE);
         for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
